@@ -14,10 +14,12 @@ import java.util.concurrent.FutureTask;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.stream.Collectors;
 
+
 public class Server implements ServerInterface{
     //Dataset of all cities 
     List <City> cities = new ArrayList<>(); 
     String filename = "exercise_1_dataset.csv";
+
 
     //Queue of waiting tasks 
     private final BlockingQueue<FutureTask<Integer>> waitingList = new LinkedBlockingQueue<>();
@@ -41,6 +43,10 @@ public class Server implements ServerInterface{
         });
         
         worker.start();
+    }
+
+    public int getWaitingSize(){
+        return waitingList.size();
     }
     
 
