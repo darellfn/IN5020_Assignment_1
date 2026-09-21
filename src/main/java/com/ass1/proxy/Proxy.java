@@ -35,26 +35,34 @@ public class Proxy implements ProxyInterface {
     }
 
     // for client to invoke when making a request and needing a server
-    public void requestServer(int zone) throws RemoteException {
+    public ArrayList<String> requestServer(int zone) throws RemoteException {
         ServerInfo server = servers.get(zone);
 
         // if the zone has a server
         if (server != null) {
             // if the server is not overloaded
             if (server.waitingListSize < 18) {
-
-                // TODO: return this server's info (to client)
+                ArrayList<String> info = new ArrayList<>(); // make a list with the ip address, port, and name of teh server the client hasbeen assigned to
+                info.add(server.ip);
+                info.add(Integer.toString(server.port));
+                info.add(server.name);
 
                 server.assignedClients += 1;    // add 1 to this server's assigned-clients counter
                 fetchUpdatedWorkload(zone);     // fetch updated workload data if needed
+
+                return info;    // return the server info to the client
             }
             else {  // if server is overloaded, try other servers
                 int newZone = checkOtherServers(zone);
-
-                // TODO: return this server's info (to client)
+                ArrayList<String> info = new ArrayList<>(); // make a list with the ip address, port, and name of teh server the client hasbeen assigned to
+                info.add(servers.get(newZone).ip);
+                info.add(Integer.toString(servers.get(newZone).port));
+                info.add(servers.get(newZone).name);
 
                 servers.get(newZone).assignedClients += 1;    // add 1 to this server's assigned-clients counter
                 fetchUpdatedWorkload(newZone);     // fetch updated workload data if needed
+
+                return info;    // return the server info to the client
             }
         }
         else {  // if the zone has no server

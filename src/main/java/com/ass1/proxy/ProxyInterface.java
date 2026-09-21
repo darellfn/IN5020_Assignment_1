@@ -2,12 +2,13 @@ package com.ass1.proxy;
 
 import java.rmi.Remote;
 import java.rmi.RemoteException;
+import java.util.ArrayList;
 
 public interface ProxyInterface extends Remote {
 
     // for clients
 
-    void requestServer(int zone) throws RemoteException;
+    ArrayList<String> requestServer(int zone) throws RemoteException;
 
     // for servers
 
