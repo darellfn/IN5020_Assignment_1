@@ -12,6 +12,7 @@ import java.util.Scanner;
 // import com.ass1.server.ServerInterface;
 
 public class Client {
+
     public static void main(String[] args) throws RemoteException, NotBoundException {
         parseQuery("exercise_1_input.txt");
 
@@ -163,6 +164,7 @@ public class Client {
 
         } catch (FileNotFoundException e) {
             System.err.println(e);
+
         }
     }
 }
