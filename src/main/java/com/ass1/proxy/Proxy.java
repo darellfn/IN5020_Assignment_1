@@ -67,6 +67,7 @@ public class Proxy implements ProxyInterface {
         }
         else {  // if the zone has no server
             requestServer(nextZone(zone));  // move to the next zone (clockwise)
+            return new ArrayList<>();   // is here because java doesn't understand a function calling itself apparently (hope its ust that lol)
         }
         
     }
