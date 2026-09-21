@@ -169,7 +169,7 @@ public class Proxy implements ProxyInterface {
     private void fetchUpdatedWorkload(int zone) throws RemoteException {
         
         // checks if update data needs to be fetched and fetches it, all on a separate thread
-        Thread fetcher = new Thread() -> {
+        Thread fetcher = new Thread(() -> {
             if (servers.get(zone).assignedClients >= 18) {  // if this server has been assigned 18 times (or more)
                 try {
                     Registry registry = LocateRegistry.getRegistry();
@@ -180,7 +180,7 @@ public class Proxy implements ProxyInterface {
                     e.printStackTrace();
                 }
             }
-        }
+        });
 
         fetcher.start();
     }
