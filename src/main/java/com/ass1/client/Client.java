@@ -9,7 +9,6 @@ import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
-import java.util.ArrayList;
 import java.util.Scanner;
 
 import com.ass1.proxy.ProxyInterface;
@@ -20,7 +19,14 @@ public class Client {
 
     public static void main(String[] args) throws RemoteException, NotBoundException, InterruptedException, IOException {
         Client client = new Client();
-        client.parseQuery("com/ass1/client/exercise_1_input.txt");
+        //client.parseQuery("com/ass1/client/exercise_1_input.txt");
+        client.parseQuery("src\\main\\java\\com\\ass1\\client\\exercise_1_input.txt");
+
+        try {
+            
+        } catch (IndexOutOfBoundsException e) {
+            // TODO: handle exception
+        }
 
     }
 
@@ -124,7 +130,7 @@ public class Client {
                 String serverName = serverInfo[2];
                 Registry serverRegistry = LocateRegistry.getRegistry(port);
                 ServerInterface serverStub = (ServerInterface) serverRegistry.lookup(serverName);
-                int result = serverStub.getPopulationofCountry(country);
+                long result = serverStub.getPopulationofCountry(country)[0];
 
                 long end = System.currentTimeMillis();
 
@@ -132,9 +138,10 @@ public class Client {
                 System.out.println("Result: " + result + " | Time: " + (end - start) + " ms");
 
             } catch (RemoteException | NotBoundException e) {
-                System.out.println("Error");
+                System.out.println("1Error - RemoteException or NotBoundException");
+                System.err.println(e);
             } catch (IOException e) {
-                System.out.println("Error");
+                System.out.println("1Error - IOException");
             }
             
         });
@@ -153,7 +160,7 @@ public class Client {
                 String serverName = serverInfo[2];
                 Registry serverRegistry = LocateRegistry.getRegistry(port);
                 ServerInterface serverStub = (ServerInterface) serverRegistry.lookup(serverName);
-                int result = serverStub.getNumberofCities(country, threshold, comp);
+                long result = serverStub.getNumberofCities(country, threshold, comp)[0];
 
                 long end = System.currentTimeMillis();
 
@@ -161,9 +168,9 @@ public class Client {
                 System.out.println("Result: " + result + " | Time: " + (end - start) + " ms");
 
             } catch (RemoteException | NotBoundException e) {
-                System.out.println("Error");
+                System.out.println("2Error - RemoteException or NotBoundException");
             } catch (IOException e) {
-                System.out.println("Error");
+                System.out.println("2Error - IOException");
             }
         });
 
@@ -182,7 +189,7 @@ public class Client {
                 String serverName = serverInfo[2];
                 Registry serverRegistry = LocateRegistry.getRegistry(port);
                 ServerInterface serverStub = (ServerInterface) serverRegistry.lookup(serverName);
-                int result = serverStub.getNumberofCountries(cityCount, threshold, comp);
+                long result = serverStub.getNumberofCountries(cityCount, threshold, comp)[0];
 
                 long end = System.currentTimeMillis();
 
@@ -190,9 +197,9 @@ public class Client {
                 System.out.println("Result: " + result + " | Time: " + (end - start) + " ms");
 
             } catch (RemoteException | NotBoundException e) {
-                System.out.println("Error");
+                System.out.println("3Error - RemoteException or NotBoundException");
             } catch (IOException e) {
-                System.out.println("Error");
+                System.out.println("3Error - IOException");
             }
         });
 
@@ -211,7 +218,7 @@ public class Client {
                 String serverName = serverInfo[2];
                 Registry serverRegistry = LocateRegistry.getRegistry(port);
                 ServerInterface serverStub = (ServerInterface) serverRegistry.lookup(serverName);
-                int result = serverStub.getNumberofCountriesMM(cityCount, minPopulation, maxPopulation);
+                long result = serverStub.getNumberofCountriesMM(cityCount, minPopulation, maxPopulation)[0];
 
                 long end = System.currentTimeMillis();
 
@@ -219,16 +226,16 @@ public class Client {
                 System.out.println("Result: " + result + " | Time: " + (end - start) + " ms");
 
             } catch (RemoteException | NotBoundException e) {
-                System.out.println("Error");
+                System.out.println("4Error - RemoteException or NotBoundException");
             } catch (IOException e) {
-                System.out.println("Error");
+                System.out.println("4Error - IOException");
             }
         });
 
         thread.start();
     }
 
-    private synchronized void writeToFile(BufferedWriter writer, int result, long turnaroundTime) throws IOException {
+    private synchronized void writeToFile(BufferedWriter writer, long result, long turnaroundTime) throws IOException {
         writer.write(result + ", " + turnaroundTime);
         writer.newLine();   
     }
