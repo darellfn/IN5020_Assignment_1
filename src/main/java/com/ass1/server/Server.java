@@ -16,8 +16,10 @@ import java.util.stream.Collectors;
 
 public class Server implements ServerInterface{
     //Dataset of all cities 
-    List <City> cities = new ArrayList<>(); 
+    List <City> cities = new ArrayList<>();
+  
     String filename = "com/ass1/server/exercise_1_dataset.csv";
+    //String filename = "src\\main\\java\\com\\ass1\\server\\exercise_1_dataset.csv";
 
 
     //Queue of waiting tasks 
@@ -169,10 +171,10 @@ public class Server implements ServerInterface{
         try {
             Server server = new Server();
            
-            System.out.println("Number of Countries: " + server.getPopulationofCountry("Norway"));
-            System.out.println("Number of Cities: " + server.getNumberofCities("Norway",100000,"min"));
-            System.out.println("Number of Countries: " + server.getNumberofCountries(2,5000000,"min"));
-            System.out.println("Number of Countries: " + server.getNumberofCountriesMM(30,100000,800000));
+            System.out.println("Number of Countries: " + server.getPopulationofCountry("Norway")[0]);
+            System.out.println("Number of Cities: " + server.getNumberofCities("Norway",100000,"min")[0]);
+            System.out.println("Number of Countries: " + server.getNumberofCountries(2,5000000,"min")[0]);
+            System.out.println("Number of Countries: " + server.getNumberofCountriesMM(30,100000,800000)[0]);
 
         } catch (RemoteException e ) {
             e.printStackTrace();

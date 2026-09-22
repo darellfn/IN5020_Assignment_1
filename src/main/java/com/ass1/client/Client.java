@@ -9,7 +9,6 @@ import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
-import java.util.ArrayList;
 import java.util.Scanner;
 
 import com.ass1.proxy.ProxyInterface;
@@ -22,7 +21,36 @@ public class Client {
 
     public static void main(String[] args) throws RemoteException, NotBoundException, InterruptedException, IOException {
         Client client = new Client();
+
+        boolean clientCache = false;
+        boolean serverCache = false;
+        boolean naiveServer = false;
+        
+        // for each potentially added flag in the command line
+        for (int i = 0; i < args.length; i++) {
+            switch (args[i]) {
+                case "-cc":
+                case "--client-cache":
+                    clientCache = true;
+                    System.out.println("Client cache enabled");
+                    System.out.println("writing to client cache file");
+                    break;
+                case "-sc":
+                case "--server-cache":
+                    serverCache = true;
+                    System.out.println("writing to server cache file");
+                case "-ns":
+                case "--naive-server":
+                    naiveServer = true;
+                    System.out.println("writing to naive server file");
+                default:
+                    break;
+            }
+        }
+
         client.parseQuery("com/ass1/client/exercise_1_input.txt");
+        //client.parseQuery("src\\main\\java\\com\\ass1\\client\\exercise_1_input.txt");
+
     }
 
     public void parseQuery(String fileName) throws RemoteException, NotBoundException, InterruptedException, IOException {
