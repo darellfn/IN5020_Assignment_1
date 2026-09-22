@@ -1,7 +1,10 @@
 package com.ass1.client;
 
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
@@ -13,16 +16,17 @@ import com.ass1.proxy.ProxyInterface;
 import com.ass1.server.ServerInterface;
 
 public class Client {
-    private final int T = 50;
+    private final int T = 20;
 
-    public static void main(String[] args) throws RemoteException, NotBoundException, InterruptedException {
+    public static void main(String[] args) throws RemoteException, NotBoundException, InterruptedException, IOException {
         Client client = new Client();
-        client.parseQuery("exercise_1_input.txt");
+        client.parseQuery("com/ass1/client/exercise_1_input.txt");
 
     }
 
-    public void parseQuery(String fileName) throws RemoteException, NotBoundException, InterruptedException {
+    public void parseQuery(String fileName) throws RemoteException, NotBoundException, InterruptedException, IOException {
         File file = new File(fileName);
+        BufferedWriter writer = new BufferedWriter(new FileWriter("output.txt"));
 
         Registry proxyRegistry = LocateRegistry.getRegistry(1099);
         ProxyInterface proxy = (ProxyInterface) proxyRegistry.lookup("proxy");
@@ -38,20 +42,20 @@ public class Client {
                         String[] zoneLine = line[3].split(":");
                         int zoneNumber = Integer.parseInt(zoneLine[1]);
 
-                        runPopulationOfCountry(proxy, country, zoneNumber);   
+                        runPopulationOfCountry(proxy, country, zoneNumber, writer);   
 
                     } else if (line.length < 3) { //I added this condition because some lines do not include any country e.g. "getPopulationofCountry Zone:3"
                         String[] zoneLine = line[1].split(":");
                         int zoneNumber = Integer.parseInt(zoneLine[1]);
 
-                        runPopulationOfCountry(proxy, "", zoneNumber);                        
+                        runPopulationOfCountry(proxy, "", zoneNumber, writer);                        
 
                     } else {
                         String country = line[1];
                         String[] zoneLine = line[2].split(":");
                         int zoneNumber = Integer.parseInt(zoneLine[1]);
 
-                        runPopulationOfCountry(proxy, country, zoneNumber);   
+                        runPopulationOfCountry(proxy, country, zoneNumber, writer);   
                     }
                     
                 } else if (method.equals("getNumberofCities")) {
@@ -62,7 +66,7 @@ public class Client {
                         String[] zoneLine = line[5].split(":");
                         int zoneNumber = Integer.parseInt(zoneLine[1]);
 
-                        runNumberOfCities(proxy, country, threshold, comp, zoneNumber);
+                        runNumberOfCities(proxy, country, threshold, comp, zoneNumber, writer);
 
                     } else if (line.length < 5) {
                         int threshold = Integer.parseInt(line[1]);
@@ -70,7 +74,7 @@ public class Client {
                         String[] zoneLine = line[3].split(":");
                         int zoneNumber = Integer.parseInt(zoneLine[1]);
                         
-                        runNumberOfCities(proxy, "", threshold, comp, zoneNumber);
+                        runNumberOfCities(proxy, "", threshold, comp, zoneNumber, writer);
 
                     } else {
                         String country = line[1];
@@ -79,7 +83,7 @@ public class Client {
                         String[] zoneLine = line[4].split(":");
                         int zoneNumber = Integer.parseInt(zoneLine[1]);
 
-                        runNumberOfCities(proxy, country, threshold, comp, zoneNumber);
+                        runNumberOfCities(proxy, country, threshold, comp, zoneNumber, writer);
 
                     }
                 } else if (method.equals("getNumberofCountries")) {
@@ -89,7 +93,7 @@ public class Client {
                     String[] zoneLine = line[4].split(":");
                     int zoneNumber = Integer.parseInt(zoneLine[1]);
 
-                    runNumberOfCountries(proxy, cityCount, threshold, comp, zoneNumber);
+                    runNumberOfCountries(proxy, cityCount, threshold, comp, zoneNumber, writer);
 
                 } else {
                     int cityCount = Integer.parseInt(line[1]);
@@ -98,7 +102,7 @@ public class Client {
                     String[] zoneLine = line[4].split(":");
                     int zoneNumber = Integer.parseInt(zoneLine[1]);
 
-                    runNumberOfCountriesMM(proxy, cityCount, minPopulation, maxPopulation, zoneNumber);
+                    runNumberOfCountriesMM(proxy, cityCount, minPopulation, maxPopulation, zoneNumber, writer);
                 }
                 Thread.sleep(T);
             }
@@ -109,7 +113,7 @@ public class Client {
         }
     }
 
-    private void runPopulationOfCountry(ProxyInterface proxy, String country, int zone) {
+    private void runPopulationOfCountry(ProxyInterface proxy, String country, int zone, BufferedWriter writer) {
         Thread thread = new Thread(() -> {
 
             try {
@@ -124,19 +128,21 @@ public class Client {
 
                 long end = System.currentTimeMillis();
 
+                writeToFile(writer, result, (end - start));
                 System.out.println("Result: " + result + " | Time: " + (end - start) + " ms");
 
             } catch (RemoteException | NotBoundException e) {
                 System.out.println("Error");
+            } catch (IOException e) {
+                System.out.println("Error");
             }
-
             
         });
 
         thread.start();
     }
 
-    private void runNumberOfCities(ProxyInterface proxy, String country, int threshold, String comp, int zone) {
+    private void runNumberOfCities(ProxyInterface proxy, String country, int threshold, String comp, int zone, BufferedWriter writer) {
         Thread thread = new Thread(() -> {
 
             try {
@@ -151,20 +157,21 @@ public class Client {
 
                 long end = System.currentTimeMillis();
 
+                writeToFile(writer, result, (end - start));
                 System.out.println("Result: " + result + " | Time: " + (end - start) + " ms");
 
             } catch (RemoteException | NotBoundException e) {
                 System.out.println("Error");
+            } catch (IOException e) {
+                System.out.println("Error");
             }
-
-            
         });
 
         thread.start();
 
     }
 
-    private void runNumberOfCountries(ProxyInterface proxy, int cityCount, int threshold, String comp, int zone) {
+    private void runNumberOfCountries(ProxyInterface proxy, int cityCount, int threshold, String comp, int zone, BufferedWriter writer) {
         Thread thread = new Thread(() -> {
 
             try {
@@ -179,9 +186,12 @@ public class Client {
 
                 long end = System.currentTimeMillis();
 
+                writeToFile(writer, result, (end - start));
                 System.out.println("Result: " + result + " | Time: " + (end - start) + " ms");
 
             } catch (RemoteException | NotBoundException e) {
+                System.out.println("Error");
+            } catch (IOException e) {
                 System.out.println("Error");
             }
         });
@@ -190,7 +200,7 @@ public class Client {
 
     }
 
-    private void runNumberOfCountriesMM(ProxyInterface proxy, int cityCount, int minPopulation, int maxPopulation, int zone) {
+    private void runNumberOfCountriesMM(ProxyInterface proxy, int cityCount, int minPopulation, int maxPopulation, int zone, BufferedWriter writer) {
         Thread thread = new Thread(() -> {
 
             try {
@@ -205,13 +215,21 @@ public class Client {
 
                 long end = System.currentTimeMillis();
 
+                writeToFile(writer, result, (end - start));
                 System.out.println("Result: " + result + " | Time: " + (end - start) + " ms");
 
             } catch (RemoteException | NotBoundException e) {
+                System.out.println("Error");
+            } catch (IOException e) {
                 System.out.println("Error");
             }
         });
 
         thread.start();
+    }
+
+    private synchronized void writeToFile(BufferedWriter writer, int result, long turnaroundTime) throws IOException {
+        writer.write(result + ", " + turnaroundTime);
+        writer.newLine();   
     }
 }
