@@ -119,9 +119,9 @@ public class Client {
             try {
                 long start = System.currentTimeMillis();
 
-                ArrayList<String> serverInfo = proxy.requestServer(zone);
-                int port = Integer.parseInt(serverInfo.get(1));
-                String serverName = serverInfo.get(2);
+                String[] serverInfo = proxy.requestServer(zone);
+                int port = Integer.parseInt(serverInfo[1]);
+                String serverName = serverInfo[2];
                 Registry serverRegistry = LocateRegistry.getRegistry(port);
                 ServerInterface serverStub = (ServerInterface) serverRegistry.lookup(serverName);
                 int result = serverStub.getPopulationofCountry(country);
@@ -148,9 +148,9 @@ public class Client {
             try {
                 long start = System.currentTimeMillis();
 
-                ArrayList<String> serverInfo = proxy.requestServer(zone);
-                int port = Integer.parseInt(serverInfo.get(1));
-                String serverName = serverInfo.get(2);
+                String[] serverInfo = proxy.requestServer(zone);
+                int port = Integer.parseInt(serverInfo[1]);
+                String serverName = serverInfo[2];
                 Registry serverRegistry = LocateRegistry.getRegistry(port);
                 ServerInterface serverStub = (ServerInterface) serverRegistry.lookup(serverName);
                 int result = serverStub.getNumberofCities(country, threshold, comp);
@@ -177,9 +177,9 @@ public class Client {
             try {
                 long start = System.currentTimeMillis();
 
-                ArrayList<String> serverInfo = proxy.requestServer(zone);
-                int port = Integer.parseInt(serverInfo.get(1));
-                String serverName = serverInfo.get(2);
+                String[] serverInfo = proxy.requestServer(zone);
+                int port = Integer.parseInt(serverInfo[1]);
+                String serverName = serverInfo[2];
                 Registry serverRegistry = LocateRegistry.getRegistry(port);
                 ServerInterface serverStub = (ServerInterface) serverRegistry.lookup(serverName);
                 int result = serverStub.getNumberofCountries(cityCount, threshold, comp);
@@ -206,9 +206,9 @@ public class Client {
             try {
                 long start = System.currentTimeMillis();
 
-                ArrayList<String> serverInfo = proxy.requestServer(zone);
-                int port = Integer.parseInt(serverInfo.get(1));
-                String serverName = serverInfo.get(2);
+                String[] serverInfo = proxy.requestServer(zone);
+                int port = Integer.parseInt(serverInfo[1]);
+                String serverName = serverInfo[2];
                 Registry serverRegistry = LocateRegistry.getRegistry(port);
                 ServerInterface serverStub = (ServerInterface) serverRegistry.lookup(serverName);
                 int result = serverStub.getNumberofCountriesMM(cityCount, minPopulation, maxPopulation);
