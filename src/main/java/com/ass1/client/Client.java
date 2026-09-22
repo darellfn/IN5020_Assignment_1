@@ -19,14 +19,34 @@ public class Client {
 
     public static void main(String[] args) throws RemoteException, NotBoundException, InterruptedException, IOException {
         Client client = new Client();
+        boolean clientCache = false;
+        boolean serverCache = false;
+        boolean naiveServer = false;
+        
+        // for each potentially added flag in the command line
+        for (int i = 0; i < args.length; i++) {
+            switch (args[i]) {
+                case "-cc":
+                case "--client-cache":
+                    clientCache = true;
+                    System.out.println("Client cache enabled");
+                    System.out.println("writing to client cache file");
+                    break;
+                case "-sc":
+                case "--server-cache":
+                    serverCache = true;
+                    System.out.println("writing to server cache file");
+                case "-ns":
+                case "--naive-server":
+                    naiveServer = true;
+                    System.out.println("writing to naive server file");
+                default:
+                    break;
+            }
+        }
+
         //client.parseQuery("com/ass1/client/exercise_1_input.txt");
         client.parseQuery("src\\main\\java\\com\\ass1\\client\\exercise_1_input.txt");
-
-        try {
-            
-        } catch (IndexOutOfBoundsException e) {
-            // TODO: handle exception
-        }
 
     }
 
@@ -138,10 +158,9 @@ public class Client {
                 System.out.println("Result: " + result + " | Time: " + (end - start) + " ms");
 
             } catch (RemoteException | NotBoundException e) {
-                System.out.println("1Error - RemoteException or NotBoundException");
-                System.err.println(e);
+                System.out.println("Error");
             } catch (IOException e) {
-                System.out.println("1Error - IOException");
+                System.out.println("Error");
             }
             
         });
@@ -168,9 +187,9 @@ public class Client {
                 System.out.println("Result: " + result + " | Time: " + (end - start) + " ms");
 
             } catch (RemoteException | NotBoundException e) {
-                System.out.println("2Error - RemoteException or NotBoundException");
+                System.out.println("Error");
             } catch (IOException e) {
-                System.out.println("2Error - IOException");
+                System.out.println("Error");
             }
         });
 
@@ -197,9 +216,9 @@ public class Client {
                 System.out.println("Result: " + result + " | Time: " + (end - start) + " ms");
 
             } catch (RemoteException | NotBoundException e) {
-                System.out.println("3Error - RemoteException or NotBoundException");
+                System.out.println("Error");
             } catch (IOException e) {
-                System.out.println("3Error - IOException");
+                System.out.println("Error");
             }
         });
 
@@ -226,9 +245,9 @@ public class Client {
                 System.out.println("Result: " + result + " | Time: " + (end - start) + " ms");
 
             } catch (RemoteException | NotBoundException e) {
-                System.out.println("4Error - RemoteException or NotBoundException");
+                System.out.println("Error");
             } catch (IOException e) {
-                System.out.println("4Error - IOException");
+                System.out.println("Error");
             }
         });
 
