@@ -21,7 +21,7 @@ public class Server implements ServerInterface{
 
 
     //Queue of waiting tasks 
-    private final BlockingQueue<FutureTask<Integer>> waitingList = new LinkedBlockingQueue<>();
+    private final BlockingQueue<FutureTask<long[]>> waitingList = new LinkedBlockingQueue<>();
   
 
     public Server(){
@@ -31,10 +31,9 @@ public class Server implements ServerInterface{
         Thread worker = new Thread(() -> {
             while(true){
                 try{
-                    FutureTask<Integer> task = waitingList.take(); //takes a task from waiting list 
+                    FutureTask<long[]> task = waitingList.take(); //takes a task from waiting list 
                     logtoFile();
                     task.run(); //executes the task 
-                   
                 }catch(Exception e){
                     e.printStackTrace();
                 }
@@ -82,15 +81,15 @@ public class Server implements ServerInterface{
     }
 
 
-    public int getPopulationofCountry(String countryName)throws RemoteException{
+    public long[] getPopulationofCountry(String countryName)throws RemoteException{
         return submit(() -> cities.stream() 
                            .filter( c -> c.getCountryName().equalsIgnoreCase(countryName)) //Only keeps city objects with given countryName
                            .mapToInt(City::getPopulation) //Only keeps population numbers 
                            .sum()); //Sums up population each city in given country 
     }
 
-    public int getNumberofCities(String countryName, int threshold, String comp) throws RemoteException{
-        return submit(() -> (int) cities.stream()
+    public long[] getNumberofCities(String countryName, int threshold, String comp) throws RemoteException{
+        return submit(() ->  (int) cities.stream()
                                       .filter(c -> c.getCountryName().equalsIgnoreCase(countryName)) //Only keeps city objects with given countryName
                                       .filter(c -> comp.equals("min")? c.getPopulation() >= threshold : c.getPopulation() <= threshold) //Only keeps city objects within the population size threshold 
                                       .count()); // Counts how many objects that satisfy the conditions above 
@@ -98,7 +97,7 @@ public class Server implements ServerInterface{
 
     }
 
-    public int getNumberofCountries(int cityCount, int threshold, String comp) throws RemoteException {
+    public long[] getNumberofCountries(int cityCount, int threshold, String comp) throws RemoteException {
          return submit(() -> (int) cities.stream()
                      .filter(c -> comp.equals("min") ? c.getPopulation() >= threshold : c.getPopulation() <= threshold) //Only keeps city objects within the population threshold 
                      .collect(Collectors.groupingBy(City::getCountryName, Collectors.counting())) //Maps each country to how many cities they have that satisfy the population threshold
@@ -110,7 +109,7 @@ public class Server implements ServerInterface{
 
  
 
-    public int getNumberofCountriesMM(int cityCount, int minPopulation, int maxPopulation)throws RemoteException{
+    public long[] getNumberofCountriesMM(int cityCount, int minPopulation, int maxPopulation)throws RemoteException{
         return submit( () -> (int) cities.stream()
                                          .filter(c -> c.getPopulation() >= minPopulation && c.getPopulation() <= maxPopulation) //Only keeps city objects within the population threshold
                                          .collect(Collectors.groupingBy(City::getCountryName, Collectors.counting())) //Maps each country to how many cities they have that satisfy the population threshold
@@ -129,34 +128,39 @@ public class Server implements ServerInterface{
         }
 
     }
-    
 
-    private int submit(Callable<Integer> task) throws RemoteException {
+    private long[] submit(Callable<Integer> task) throws RemoteException {
+    long enqueueTime = System.currentTimeMillis();
 
-        FutureTask<Integer> future = new FutureTask<>(task);
+        FutureTask<long[]> future = new FutureTask<>(() -> {
+            long dequeueTime = System.currentTimeMillis();
+            long waitingTime = dequeueTime - enqueueTime;
+
+            long execStart = System.currentTimeMillis();
+            int result = task.call();
+            long execEnd = System.currentTimeMillis();
+            long executionTime = execEnd - execStart;
+
+            return new long[] { result, waitingTime, executionTime };
+        });
 
         try {
-            //Simulate network latency 
-            Thread.sleep(80);
-
-            //Put task in FIFO queue
+            Thread.sleep(80); // simulate network latency
             waitingList.add(future);
             logtoFile();
-
-
-            //Wait for worker to execute it
             return future.get();
-
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             throw new RemoteException("Interrupted", e);
-
         } catch (ExecutionException e) {
             throw new RemoteException("Task failed", e);
         }
     }
+    
 
-    //TODO: Keep track of waiting time and execution time
+
+
+    
 
    
 
