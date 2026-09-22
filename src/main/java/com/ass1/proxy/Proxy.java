@@ -169,6 +169,7 @@ public class Proxy implements ProxyInterface {
         
         // checks if update data needs to be fetched and fetches it, all on a separate thread
         Thread fetcher = new Thread(() -> {
+
                 try {
                     Registry registry = LocateRegistry.getRegistry(servers.get(zone).port);
                     ServerInterface remoteServer = (ServerInterface) registry.lookup(server.name);
@@ -181,7 +182,7 @@ public class Proxy implements ProxyInterface {
                 } catch (RemoteException | NotBoundException | NullPointerException e) {
                     e.printStackTrace();
                 }
-            
+
         });
 
         fetcher.start();
