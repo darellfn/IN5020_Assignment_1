@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
 public class Server implements ServerInterface{
     //Dataset of all cities 
     List <City> cities = new ArrayList<>(); 
-    String filename = "exercise_1_dataset.csv";
+    String filename = "com/ass1/server/exercise_1_dataset.csv";
 
 
     //Queue of waiting tasks 
