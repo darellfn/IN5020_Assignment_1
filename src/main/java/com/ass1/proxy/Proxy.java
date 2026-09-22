@@ -32,17 +32,18 @@ public class Proxy implements ProxyInterface {
     }
 
     // for client to invoke when making a request and needing a server
-    public synchronized ArrayList<String> requestServer(int zone) throws RemoteException {
+    public synchronized String[] requestServer(int zone) throws RemoteException {
         ServerInfo server = servers.get(zone);
 
         // if the zone has a server
         if (server != null) {
             // if the server is not overloaded
             if (server.waitingListSize < 18) {
-                ArrayList<String> info = new ArrayList<>(); // make a list with the ip address, port, and name of teh server the client hasbeen assigned to
-                info.add(server.ip);
-                info.add(Integer.toString(server.port));
-                info.add(server.name);
+                String[] info = {   // make an array with the ip address, port, and name of the server the client has been assigned to
+                    server.ip,
+                    Integer.toString(server.port),
+                    server.name
+                };
 
                 server.assignedClients += 1;    // add 1 to this server's assigned-clients counter
                 fetchUpdatedWorkload(zone);     // fetch updated workload data if needed
@@ -51,12 +52,13 @@ public class Proxy implements ProxyInterface {
             }
             else {  // if server is overloaded, try other servers
                 int newZone = checkOtherServers(zone);
-                ArrayList<String> info = new ArrayList<>(); // make a list with the ip address, port, and name of teh server the client hasbeen assigned to
-                info.add(servers.get(newZone).ip);
-                info.add(Integer.toString(servers.get(newZone).port));
-                info.add(servers.get(newZone).name);
+                String[] info = {   // make an array with the ip address, port, and name of the server the client has been assigned to
+                    servers.get(newZone).ip,
+                    Integer.toString(servers.get(newZone).port),
+                    servers.get(newZone).name
+                };
 
-                server.assignedClients += 1;    // add 1 to this server's assigned-clients counter
+                servers.get(newZone).assignedClients += 1;    // add 1 to this server's assigned-clients counter
                 fetchUpdatedWorkload(newZone);     // fetch updated workload data if needed
 
                 return info;    // return the server info to the client
@@ -64,7 +66,6 @@ public class Proxy implements ProxyInterface {
         }
         else {  // if the zone has no server
             return requestServer(nextZone(zone));  // move to the next zone (clockwise)
-            // is here because java doesn't understand a function calling itself apparently (hope its ust that lol)
         }
         
     }
@@ -83,39 +84,38 @@ public class Proxy implements ProxyInterface {
 
         for (ServerInfo server : servers.values()) { 
             if (server.zone == clientZone) {    // ignore the server in the client zone
-                // if this is the first server in the list, aka the one with the shortest waiting list
                 continue;
             }
             
-            if (server.waitingListSize >= 18) {
+            if (server.waitingListSize >= 18) { // skip overloaded servers
                 continue;
             }
 
-            if (server.waitingListSize < smallestWaitingList) {
+            if (server.waitingListSize < smallestWaitingList) { // if this waiting list is shorter than the min, save it as the new min
                 smallestWaitingList = server.waitingListSize;
 
-                bestZones.clear();
-                bestZones.add(server.zone);
-            } else if (server.waitingListSize == smallestWaitingList) {
+                bestZones.clear();  // reset the list of zones with shortest waiting lists
                 bestZones.add(server.zone);
             }
-
+            else if (server.waitingListSize == smallestWaitingList) {   // if this waiting list is as short as the min, add it to the list of best zones
+                bestZones.add(server.zone);
+            }
         }
-        if (bestZones.isEmpty()) {
+        
+        if (bestZones.isEmpty()) {  // if all servers are overloaded, return client zone
             return clientZone;
         }
-
-        if (bestZones.size() == 1) {
+        
+        if (bestZones.size() == 1) {    // if there is only one shortest waiting list, return that server's zone
             return bestZones.get(0);
         }
-
-        return findNearestZone(clientZone, bestZones);
+        // otherwise there are multiple shotest waiting lists, so find the nearest
+        return findNearestZone(clientZone, bestZones);  // return the nearest zone (clockwise)
     }
 
     // takes in a zone number and returns the next zone number (clockwise)
     private int nextZone(int zone) {
-        // if this zone number is the 'last' one, go back to 1
-        if (zone == numZones) {
+        if (zone == numZones) { // if this zone number is the 'last' one, go back to 1
             return 1;
         }
         else {  // otherwise, return the zone number + 1
@@ -127,15 +127,18 @@ public class Proxy implements ProxyInterface {
     private int findNearestZone(int startZone, ArrayList<Integer> zoneList) {
         int nearestZone = startZone;
         int minDistance = numZones;
+
         for (Integer zone : zoneList) { // for each zone in the zone list, calculate the zone's clockwise distance from the start-zone
             int distance = 0;
+
             if (startZone < zone) {
                 distance = zone - startZone;
             }
             else {
                 distance = numZones - (startZone - zone);
             }
-            if (distance < minDistance) {   // if the distance is smaller than the spreviously smallest distance, replace the min distance
+
+            if (distance < minDistance) {   // if the distance is smaller than the current min distance, replace the min distance
                 minDistance = distance;
                 nearestZone = zone;
             }
@@ -151,7 +154,6 @@ public class Proxy implements ProxyInterface {
             if (server.assignedClients < 18) {
                 return;
             }
-
             server.assignedClients = 0;
         }
         
