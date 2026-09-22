@@ -1,18 +1,14 @@
 package com.ass1.proxy;
 
+import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.HashMap;
 
 import com.ass1.server.ServerInterface;
-
-import java.lang.reflect.Array;
-import java.rmi.AlreadyBoundException;
-import java.rmi.NotBoundException;
 
 public class Proxy implements ProxyInterface {
     // HashMap for storing zone numbers and corresponding zone's server's
@@ -24,18 +20,19 @@ public class Proxy implements ProxyInterface {
     public static void main(String[] args) {
 
         try {
-            Registry registry = LocateRegistry.getRegistry();
+            Registry registry = LocateRegistry.createRegistry(1099);
             Proxy proxy = new Proxy();
-            ProxyInterface proxyStub = (ProxyInterface) UnicastRemoteObject.exportObject(proxy, 0);
-            registry.bind("proxy", proxyStub);
-        } catch (RemoteException | AlreadyBoundException e) {
+            ProxyInterface proxyStub = (ProxyInterface) UnicastRemoteObject.exportObject(proxy, 5001);
+            registry.rebind("proxy", proxyStub);
+            System.out.println("Proxy is running...");
+        } catch (RemoteException e) {
             e.printStackTrace();
         }
 
     }
 
     // for client to invoke when making a request and needing a server
-    public ArrayList<String> requestServer(int zone) throws RemoteException {
+    public synchronized ArrayList<String> requestServer(int zone) throws RemoteException {
         ServerInfo server = servers.get(zone);
 
         // if the zone has a server
@@ -59,15 +56,15 @@ public class Proxy implements ProxyInterface {
                 info.add(Integer.toString(servers.get(newZone).port));
                 info.add(servers.get(newZone).name);
 
-                servers.get(newZone).assignedClients += 1;    // add 1 to this server's assigned-clients counter
+                server.assignedClients += 1;    // add 1 to this server's assigned-clients counter
                 fetchUpdatedWorkload(newZone);     // fetch updated workload data if needed
 
                 return info;    // return the server info to the client
             }
         }
         else {  // if the zone has no server
-            requestServer(nextZone(zone));  // move to the next zone (clockwise)
-            return new ArrayList<>();   // is here because java doesn't understand a function calling itself apparently (hope its ust that lol)
+            return requestServer(nextZone(zone));  // move to the next zone (clockwise)
+            // is here because java doesn't understand a function calling itself apparently (hope its ust that lol)
         }
         
     }
@@ -81,45 +78,38 @@ public class Proxy implements ProxyInterface {
 
 
     private int checkOtherServers(int clientZone) {
-        ArrayList<ServerInfo> serverList = new ArrayList<>(servers.values());   // make a list of all the servers
-        serverList.sort(Comparator.comparing(ServerInfo::getWaitingList));      // sort the list of servers by the length of their waiting-lists (ascending)
+        int smallestWaitingList = Integer.MAX_VALUE;
+        ArrayList<Integer> bestZones = new ArrayList<>();
 
-        int min = 0, minWaitingList = 0, overloaded = 0;
-
-        for (ServerInfo server : serverList) { 
-            if (server.zone != clientZone) {    // ignore the server in the client zone
+        for (ServerInfo server : servers.values()) { 
+            if (server.zone == clientZone) {    // ignore the server in the client zone
                 // if this is the first server in the list, aka the one with the shortest waiting list
-                if (server == serverList.get(0)) {
-                    min += 1;    // add 1 to the min counter
-                    minWaitingList = server.waitingListSize;    // save the shortest waiting-list length to a variable
-                }
-                // if this server also has the shortest waiting-list length
-                if (server.waitingListSize == minWaitingList) {
-                    min += 1;   // add 1 to the min counter
-                }
-                // if the server is overloaded
-                if (server.waitingListSize >= 18) {
-                    overloaded += 1;    // add 1 to the overloaded counter
-                }
+                continue;
             }
-        }
-        // if all servers are overloaded (-1 because we ignored the server in the client zone)
-        if (overloaded == numZones - 1) {
-            return clientZone;  // return client zone
-        }
-        // if there is more than one shortest waiting-list length
-        else if (min > 1) {
-            // make a list of only the zone numbers of the servers with the min waiting-list length
-            ArrayList<Integer> zoneList = new ArrayList<>();
-            for (int i = 0; i < min; i++) {
-                zoneList.add(serverList.get(i).zone);
+            
+            if (server.waitingListSize >= 18) {
+                continue;
             }
-            return findNearestZone(clientZone, zoneList);   // return the nearest zone (clockwise)
+
+            if (server.waitingListSize < smallestWaitingList) {
+                smallestWaitingList = server.waitingListSize;
+
+                bestZones.clear();
+                bestZones.add(server.zone);
+            } else if (server.waitingListSize == smallestWaitingList) {
+                bestZones.add(server.zone);
+            }
+
         }
-        // if there is only one smallest waiting-list length
-        else {
-            return serverList.get(0).zone;  // return zone of the server with smallest waiting list
+        if (bestZones.isEmpty()) {
+            return clientZone;
         }
+
+        if (bestZones.size() == 1) {
+            return bestZones.get(0);
+        }
+
+        return findNearestZone(clientZone, bestZones);
     }
 
     // takes in a zone number and returns the next zone number (clockwise)
@@ -167,19 +157,32 @@ public class Proxy implements ProxyInterface {
 
     // starts a new thread and fetches updated waiting-list data for this server if required
     private void fetchUpdatedWorkload(int zone) throws RemoteException {
+        ServerInfo server = servers.get(zone);
+
+        synchronized (server) {
+            if (server.assignedClients < 18) {
+                return;
+            }
+
+            server.assignedClients = 0;
+        }
         
         // checks if update data needs to be fetched and fetches it, all on a separate thread
         Thread fetcher = new Thread(() -> {
-            if (servers.get(zone).assignedClients >= 18) {  // if this server has been assigned 18 times (or more)
+
                 try {
-                    Registry registry = LocateRegistry.getRegistry();
-                    ServerInterface server = (ServerInterface) registry.lookup(servers.get(zone).name);
-                    servers.get(zone).waitingListSize = server.getWaitingSize();    // fetches the waiting-list length from the server
+                    Registry registry = LocateRegistry.getRegistry(servers.get(zone).port);
+                    ServerInterface remoteServer = (ServerInterface) registry.lookup(server.name);
+                    int waitingSize = remoteServer.getWaitingSize();  // fetches the waiting-list length from the server
                     servers.get(zone).assignedClients = 0;  // reset the server's assigned-clients counter to 0
+                
+                    synchronized (server) {
+                        server.waitingListSize = waitingSize;
+                    }
                 } catch (RemoteException | NotBoundException | NullPointerException e) {
                     e.printStackTrace();
                 }
-            }
+
         });
 
         fetcher.start();

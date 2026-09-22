@@ -1,12 +1,11 @@
 package com.ass1.server;
-import java.rmi.RemoteException;
-import java.util.ArrayList;
-import java.util.List;
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.rmi.RemoteException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
@@ -124,7 +123,7 @@ public class Server implements ServerInterface{
     // Used to write to the log keeping track of queue info 
     private void logtoFile(){
         try  (FileWriter fw = new FileWriter("server_log.csv", true)){
-            fw.write(waitingList.size() + " " + System.currentTimeMillis() + "/n");
+            fw.write(waitingList.size() + " " + System.currentTimeMillis() + "\n");
         } catch (IOException e){
             e.printStackTrace();
         }
