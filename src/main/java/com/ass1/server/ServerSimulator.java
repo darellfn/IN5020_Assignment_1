@@ -19,12 +19,12 @@ public class ServerSimulator{
 
             int port = 5002;
 
-            for(int i=0; i< 5; i++){
+            for(int i = 1; i < 6; i++){
                 Server server = new Server();
                 Registry serverRegistry = LocateRegistry.createRegistry(port);
                 ServerInterface serverStub = (ServerInterface) UnicastRemoteObject.exportObject(server, 0);
-                serverRegistry.bind("server" + i, serverStub);
-                proxy.registerNewServer("localhost", port, "server" + i);
+                serverRegistry.bind("Server " + i, serverStub);
+                proxy.registerNewServer("localhost", port, "Server " + i);
                 port++;
             }
 
