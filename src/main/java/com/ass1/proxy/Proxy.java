@@ -143,18 +143,6 @@ public class Proxy implements ProxyInterface {
         return nearestZone;
     }
 
-    private String getIP(int zone) {
-        return servers.get(zone).ip;
-    }
-
-    private int getPort(int zone) {
-        return servers.get(zone).port;
-    }
-
-    private String getName(int zone) {
-        return servers.get(zone).name;
-    }
-
     // starts a new thread and fetches updated waiting-list data for this server if required
     private void fetchUpdatedWorkload(int zone) throws RemoteException {
         ServerInfo server = servers.get(zone);
