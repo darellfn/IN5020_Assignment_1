@@ -2,10 +2,16 @@
 
 ## User guide
 Step-by-step instructions for compiling, building, deploying and running the application:
-1. Compile all java files within `src\main\java\`: `javac src\main\java\*\*.java`
-2. Run `Proxy.java`: `java src\main\java\proxy\Proxy.java`
-3. Run `ServerSimulator.java`: `java src\main\java\server\ServerSimulator.java <arg1> <arg2>`
-4. Run `Client.java`: `java src\main\java\client\Client.java`
+1. Compile all java files within `src\main\java\`\
+     `javac src\main\java\com\ass1\*\*.java`
+3. Run `Proxy.java`\
+     `java src\main\java\com\ass1\proxy\Proxy.java`\
+5. Run `ServerSimulator.java` with [two arguments](###serversimulatorjava).
+     `java src\main\java\com\ass1\server\ServerSimulator.java <arg1> <arg2>`\
+7. Run `Client.java` with optional [flag arguments](###clientjava)
+     `java src\main\java\com\ass1\client\Client.java <flags>`
+
+Flags and arguments are explained in the [next section](##command-line-flags).
 
 
 ## Command line flags
