@@ -23,7 +23,8 @@ public class Server implements ServerInterface{
   
     String filename = "com/ass1/server/exercise_1_dataset.csv";
     //String filename = "src\\main\\java\\com\\ass1\\server\\exercise_1_dataset.csv";
-
+    
+    private final int serverId;
     private final boolean cachingOn;
     private final Map<String, Integer> cache;
 
@@ -31,8 +32,9 @@ public class Server implements ServerInterface{
     private final BlockingQueue<FutureTask<long[]>> waitingList = new LinkedBlockingQueue<>();
   
 
-    public Server(boolean cachingOn, boolean useLruEviction){
+    public Server(int serverId, boolean cachingOn, boolean useLruEviction){
         this.cachingOn = cachingOn;
+        this.serverId = serverId;
         
         if (cachingOn) {
             final int CACHE_CAPACITY = 150;
@@ -45,6 +47,7 @@ public class Server implements ServerInterface{
         } else {
             this.cache = null; 
         }
+        clearLogFile();
 
         readFile(filename);
         
@@ -151,10 +154,18 @@ public class Server implements ServerInterface{
                                          .count()); //Count how many countries satisfy the codition above 
         });
     }
+
+    private void clearLogFile() {
+        try (FileWriter fw = new FileWriter("server_log" + this.serverId + ".csv", false)) {
+            // opening with append=false truncates the file immediately
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
     
     // Used to write to the log keeping track of queue info 
     private void logtoFile(){
-        try  (FileWriter fw = new FileWriter("server_log.csv", true)){
+        try  (FileWriter fw = new FileWriter("server_log" +this.serverId + ".csv", true)){
             fw.write(waitingList.size() + " " + System.currentTimeMillis() + "\n");
         } catch (IOException e){
             e.printStackTrace();

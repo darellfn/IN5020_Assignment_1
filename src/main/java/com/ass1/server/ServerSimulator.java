@@ -22,7 +22,7 @@ public class ServerSimulator{
             int port = 5002;
 
             for(int i = 1; i < 6; i++){         
-                Server server = new Server(cachingOn, useLruEviction);
+                Server server = new Server(i, cachingOn, useLruEviction);
                 Registry serverRegistry = LocateRegistry.createRegistry(port);
                 ServerInterface serverStub = (ServerInterface) UnicastRemoteObject.exportObject(server, 0);
                 serverRegistry.bind("Server " + i, serverStub);
