@@ -6,9 +6,9 @@ Step-by-step instructions for compiling, building, deploying and running the app
      `javac src\main\java\com\ass1\*\*.java`
 3. Run `Proxy.java` \
      `java src\main\java\com\ass1\proxy\Proxy.java`
-5. Run `ServerSimulator.java` with [two arguments](#serversimulatorjava).\
+5. Run `ServerSimulator.java` with two arguments\
      `java src\main\java\com\ass1\server\ServerSimulator.java <arg1> <arg2>`
-7. Run `Client.java` with optional [flag arguments](#clientjava).\
+7. Run `Client.java` with optional flag arguments\
      `java src\main\java\com\ass1\client\Client.java <flags>`
 
 Flags and arguments are explained in the [next section](#command-line-flags).
