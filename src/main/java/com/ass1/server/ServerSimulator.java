@@ -14,13 +14,15 @@ public class ServerSimulator{
     public static void main(String[] args) throws NotBoundException {
 
         try{
+            boolean cachingOn = Boolean.parseBoolean(args[0]);
+            boolean useLruEviction = Boolean.parseBoolean(args[1]);
             Registry registry = LocateRegistry.getRegistry(1099); // Må finne ut API til serverproxy 
             ProxyInterface proxy = (ProxyInterface) registry.lookup("proxy");
 
             int port = 5002;
 
-            for(int i = 1; i < 6; i++){
-                Server server = new Server();
+            for(int i = 1; i < 6; i++){         
+                Server server = new Server(cachingOn, useLruEviction);
                 Registry serverRegistry = LocateRegistry.createRegistry(port);
                 ServerInterface serverStub = (ServerInterface) UnicastRemoteObject.exportObject(server, 0);
                 serverRegistry.bind("Server " + i, serverStub);
