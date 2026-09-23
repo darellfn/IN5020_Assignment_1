@@ -21,7 +21,7 @@ public class Server implements ServerInterface{
     //Dataset of all cities 
     List <City> cities = new ArrayList<>();
   
-    String filename = "com/ass1/server/exercise_1_dataset.csv";
+    String filename = "data/exercise_1_dataset.csv";
     //String filename = "src\\main\\java\\com\\ass1\\server\\exercise_1_dataset.csv";
     
     private final int serverId;
@@ -156,7 +156,7 @@ public class Server implements ServerInterface{
     }
 
     private void clearLogFile() {
-        try (FileWriter fw = new FileWriter("server_log" + this.serverId + ".csv", false)) {
+        try (FileWriter fw = new FileWriter("output/server_log" + this.serverId + ".csv", false)) {
             // opening with append=false truncates the file immediately
         } catch (IOException e) {
             e.printStackTrace();
@@ -165,7 +165,7 @@ public class Server implements ServerInterface{
     
     // Used to write to the log keeping track of queue info 
     private void logtoFile(){
-        try  (FileWriter fw = new FileWriter("server_log" +this.serverId + ".csv", true)){
+        try  (FileWriter fw = new FileWriter("output/server_log" +this.serverId + ".csv", true)){
             fw.write(waitingList.size() + " " + System.currentTimeMillis() + "\n");
         } catch (IOException e){
             e.printStackTrace();

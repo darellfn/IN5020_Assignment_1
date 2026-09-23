@@ -1,4 +1,4 @@
-package com.ass1;
+package com.ass1.server;
 
 import java.util.ArrayList;
 

@@ -12,8 +12,8 @@ import java.rmi.registry.Registry;
 import java.util.ArrayList;
 import java.util.Scanner;
 
-import com.ass1.Cache;
 import com.ass1.proxy.ProxyInterface;
+import com.ass1.server.Cache;
 import com.ass1.server.ServerInterface;
 
 public class Client {
@@ -90,7 +90,7 @@ public class Client {
                 case "-wcc":
                 case "--write-client-cache":
                     if (outputFile.equals("")) { // if not other output file has been set
-                        outputFile = "client_cache.txt";
+                        outputFile = "output/client_cache.txt";
                         System.out.println("Writing client cache file.");
                     }
                     else {  // if output file was already set
@@ -103,7 +103,7 @@ public class Client {
                 case "-wsc":
                 case "--write-server-cache":
                     if (outputFile.equals("")) { // if not other output file has been set
-                        outputFile = "server_cache.txt";
+                        outputFile = "output/server_cache.txt";
                         System.out.println("Writing server cache file.");
                     }
                     else {  // if output file was already set
@@ -125,7 +125,7 @@ public class Client {
                     }
                     break;
                 
-                // anything else is an unrexognized argument
+                // anything else is an unrecognized argument
                 default:
                     System.err.println("Error: '" + args[i] + "' is an unrecognized argument.");
                     System.exit(1);
@@ -143,14 +143,13 @@ public class Client {
             System.out.println("Delay time set to 20 ms");
         }
 
-        client.parseQuery("com/ass1/client/exercise_1_input.txt");
+        client.parseQuery();
     }
 
+    public void parseQuery() throws RemoteException, NotBoundException, InterruptedException, IOException {
+        File file = new File("data/exercise_1_input.txt");
 
-    public void parseQuery(String fileName) throws RemoteException, NotBoundException, InterruptedException, IOException {
-        File file = new File(fileName);
-
-        if (outputFile.equals("")) { outputFile = "naive_server.txt"; }
+        if (outputFile.equals("")) { outputFile = "output/naive_server.txt"; }
         BufferedWriter writer = new BufferedWriter(new FileWriter(outputFile));
 
         Registry proxyRegistry = LocateRegistry.getRegistry(1099);
