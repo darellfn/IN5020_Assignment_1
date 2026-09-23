@@ -18,7 +18,7 @@ import com.ass1.proxy.ProxyInterface;
 import com.ass1.server.ServerInterface;
 
 public class Client {
-    private final int T = 20;
+    private static int T = 0;
     private ArrayList<TaskInfo> tasks = new ArrayList<>();
     private ArrayList<Thread> threads = new ArrayList<>();
 
@@ -39,6 +39,54 @@ public class Client {
                     System.out.println("Client cache enabled.");
                     break;
                 
+                // to set the client caching method to FIFO
+                case "-fifo":
+                    if (clientCache) {
+                        cache.setMethod("FIFO");
+                        System.out.println("Client caching method set to FIFO.");
+                    }
+                    else {
+                        System.err.println("Error: client caching not enabled. Please enable client caching before choosing");
+                        System.exit(1);
+                    }
+                    break;
+                
+                // to set the client caching method to OLDEST
+                case "-oldest":
+                    if (clientCache) {
+                        cache.setMethod("OLDEST");
+                        System.out.println("Client caching method set to OLDEST.");
+                    }
+                    else {
+                        System.err.println("Error: client caching not enabled. Please enable client caching before choosing");
+                        System.exit(1);
+                    }
+                    break;
+
+                // to set the delay T to 20
+                case "-20":
+                    if (T == 0) {
+                        T = 20;
+                        System.out.println("Delay time set to 20 ms");
+                    }
+                    else {
+                        System.err.println("Error: cannot set two delay times.");
+                        System.exit(1);
+                    }
+                    break;
+
+                // to set the delay T to 50
+                case "-50":
+                    if (T == 0) {
+                        T = 50;
+                        System.out.println("Delay time set to 50 ms");
+                    }
+                    else {
+                        System.err.println("Error: cannot set two delay times.");
+                        System.exit(1);
+                    }
+                    break;
+                    
                 // to write the client_cache.txt file
                 case "-wcc":
                 case "--write-client-cache":
@@ -85,13 +133,19 @@ public class Client {
                     break;
             }
         }
+
         if (outputFile == "client_cache.txt" & !clientCache) {
             System.err.println("Error: cannot write to client cache file when client cache is disabled. Please enable client cache.");
             System.exit(1);
         }
 
-        client.parseQuery("com/ass1/client/exercise_1_input.txt");
-        //client.parseQuery("src\\main\\java\\com\\ass1\\client\\exercise_1_input.txt");
+        if (T == 0) {
+            T = 20;
+            System.out.println("Delay time set to 20 ms");
+        }
+
+        //client.parseQuery("com/ass1/client/exercise_1_input.txt");
+        client.parseQuery("src\\main\\java\\com\\ass1\\client\\exercise_1_input.txt");
 
     }
 
