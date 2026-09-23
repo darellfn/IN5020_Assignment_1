@@ -53,9 +53,11 @@ public class Cache {
     // changes the update method used (FIFO or OLDEST)
     public boolean setMethod(String method) {
         switch (method) {
+            case "1":
             case "FIFO":
                 this.method = "FIFO";
                 return true;
+            case "2":
             case "OLDEST":
                 this.method = "OLDEST";
                 return true;
@@ -65,7 +67,7 @@ public class Cache {
     }
 
     // looks for query result in cache
-    public String checkCache(String query, String data) {
+    synchronized public String checkCache(String query) {
         // if a cached query matches the search query, return its data
         for (CacheItem cacheItem : cacheStorage) {
             if (cacheItem.getQuery() == query) {
@@ -83,8 +85,8 @@ public class Cache {
 
 
     // add a new query and result to cache
-    public void addToCache(String query, String data) {
-        if (checkCache(query, data) == null) {  // making sure query is not already cached 
+    synchronized public void addToCache(String query, String data) {
+        if (checkCache(query) == null) {  // making sure query is not already cached 
             if (cacheStorage.size() < limit) {  // if cache size limit has not been reached, add the query and result
                 cacheStorage.add(new CacheItem(query, data));
                 return;
@@ -99,14 +101,15 @@ public class Cache {
     }
 
     // method 1: FIFO
-    public void fifo(String query, String data) {
-        cacheStorage.remove(cacheStorage.size() - 1);   // remove first (oldest) entry
+    synchronized public void fifo(String query, String data) {
+        cacheStorage.remove(0);   // remove first (oldest) entry
         cacheStorage.add(new CacheItem(query, data));   // add new entry to the end of the cache list
     }
 
     // method 2: OLDEST
-    public void oldest(String query, String data) {
+    synchronized public void oldest(String query, String data) {
         // TODO: use this is we are not sorting the list in checkCache:
+        /*
         long minTimestamp = System.currentTimeMillis();
         CacheItem oldestCacheItem = null;
         // iterate over cache items to find the one with oldest timestamp
@@ -118,9 +121,10 @@ public class Cache {
         }
         cacheStorage.remove(oldestCacheItem);   // remove entry with oldest timestamp
         cacheStorage.add(new CacheItem(query, data));   // add new entry to the end of the cache list
+        */
 
         // TODO: literally the same as fifo method if we sort the list in checkCache
-        cacheStorage.remove(cacheStorage.size() - 1);   // remove first entry (has the oldest timestamp because of the sorting done in checkCache)
+        cacheStorage.remove(0);   // remove first entry (has the oldest timestamp because of the sorting done in checkCache)
         cacheStorage.add(new CacheItem(query, data));   // add new entry to the end of the cache list
     }
 
