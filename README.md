@@ -21,10 +21,8 @@ If none of these flags are given, the default delay is 20ms.
 
 
 To set which output file to create/write to, use the flags:\
-Write  client_cache.txt: `-wcc` `--write-client-cache`
-
-Write  server_cache.txt: `-wsc` `--write-server-cache`
-
+Write  client_cache.txt: `-wcc` `--write-client-cache`\
+Write  server_cache.txt: `-wsc` `--write-server-cache`\
 Write  naive_server.txt: `-wns` `--write-naive-server`\
 If none of these flags are given, the default output file is `naive_server.txt`.
 \
@@ -35,7 +33,8 @@ If none of these flags are given, the default output file is `naive_server.txt`.
 Takes in two boolean arguments at the command line.
 The first argument enables server cache:\
 `true` - server cache enabled\
-`false` - server cache disabled\
+`false` - server cache disabled
+
 The second argument enables the OLDEST cache method:\
 `true` - OLDEST method used\
 `false` - FIFO method used
