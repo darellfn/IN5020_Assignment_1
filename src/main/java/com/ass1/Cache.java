@@ -70,8 +70,8 @@ public class Cache {
     synchronized public String checkCache(String query) {
         // if a cached query matches the search query, return its data
         for (CacheItem cacheItem : cacheStorage) {
-            if (cacheItem.getQuery() == query) {
-                if (method == "OLDEST") {   // update the timestamp if using OLDEST method
+            if (cacheItem.getQuery().equals(query)) {
+                if (method.equals("OLDEST")) {   // update the timestamp if using OLDEST method
                     cacheItem.updateTimestamp();
                     // TODO: unsure about this line below: (should i move stuff around in the cache?)
                     if (cacheStorage.remove(cacheItem)) { cacheStorage.add(cacheItem); }    // move the most recently accessed item to the back of the cache list
@@ -91,7 +91,7 @@ public class Cache {
                 cacheStorage.add(new CacheItem(query, data));
                 return;
             }
-            if (method == "FIFO") {
+            if (method.equals("FIFO")) {
                 fifo(query, data); 
             }
             else {  // if method == "OLDEST"

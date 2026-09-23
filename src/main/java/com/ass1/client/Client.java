@@ -90,8 +90,8 @@ public class Client {
             System.exit(1);
         }
 
-        //client.parseQuery("com/ass1/client/exercise_1_input.txt");
-        client.parseQuery("src\\main\\java\\com\\ass1\\client\\exercise_1_input.txt");
+        client.parseQuery("com/ass1/client/exercise_1_input.txt");
+        //client.parseQuery("src\\main\\java\\com\\ass1\\client\\exercise_1_input.txt");
 
     }
 
@@ -99,7 +99,7 @@ public class Client {
     public void parseQuery(String fileName) throws RemoteException, NotBoundException, InterruptedException, IOException {
         File file = new File(fileName);
 
-        if (outputFile == "") { outputFile = "naive_server.txt"; }  // TODO <---- PLACEHOLDER!!!
+        if (outputFile == "") { outputFile = "naive_server.txt"; }
         BufferedWriter writer = new BufferedWriter(new FileWriter(outputFile));
 
         Registry proxyRegistry = LocateRegistry.getRegistry(1099);
