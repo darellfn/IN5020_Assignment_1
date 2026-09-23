@@ -25,7 +25,7 @@ Write  client_cache.txt: `-wcc` `--write-client-cache`\
 Write  server_cache.txt: `-wsc` `--write-server-cache`\
 Write  naive_server.txt: `-wns` `--write-naive-server`\
 If none of these flags are given, the default output file is `naive_server.txt`.
-\
+
 
 
 ### `ServerSimulator.java`
