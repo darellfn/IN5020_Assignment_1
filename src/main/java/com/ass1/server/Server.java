@@ -5,7 +5,9 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
@@ -14,17 +16,34 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.stream.Collectors;
 
 
+
 public class Server implements ServerInterface{
     //Dataset of all cities 
     List <City> cities = new ArrayList<>(); 
     String filename = "com/ass1/server/exercise_1_dataset.csv";
 
+    private final boolean cachingOn;
+    private final Map<String, Integer> cache;
 
     //Queue of waiting tasks 
     private final BlockingQueue<FutureTask<long[]>> waitingList = new LinkedBlockingQueue<>();
   
 
-    public Server(){
+    public Server(boolean cachingOn, boolean useLruEviction){
+        this.cachingOn = cachingOn;
+        
+        if (cachingOn) {
+            final int CACHE_CAPACITY = 150;
+            this.cache = new LinkedHashMap<>(16, 0.75f, useLruEviction) {
+                @Override
+                protected boolean removeEldestEntry(Map.Entry<String, Integer> eldest) {
+                    return size() > CACHE_CAPACITY;
+                }
+            };
+        } else {
+            this.cache = null; 
+        }
+
         readFile(filename);
         
         // One worker thread picking up tasks to execute in FIFO order 
@@ -82,41 +101,53 @@ public class Server implements ServerInterface{
 
 
     public long[] getPopulationofCountry(String countryName)throws RemoteException{
-        return submit(() -> cities.stream() 
+        return submit(() ->{
+            String key = "getPopulationofCountry" + countryName;
+
+            return cachedOrCompute(key,() -> cities.stream() 
                            .filter( c -> c.getCountryName().equalsIgnoreCase(countryName)) //Only keeps city objects with given countryName
                            .mapToInt(City::getPopulation) //Only keeps population numbers 
-                           .sum()); //Sums up population each city in given country 
+                           .sum());
+                        }); //Sums up population each city in given country 
     }
 
     public long[] getNumberofCities(String countryName, int threshold, String comp) throws RemoteException{
-        return submit(() ->  (int) cities.stream()
+        return submit(() ->  {
+            String key = "getNumberofCities" + countryName + threshold + comp;
+
+            return cachedOrCompute(key, () -> (int) cities.stream()
                                       .filter(c -> c.getCountryName().equalsIgnoreCase(countryName)) //Only keeps city objects with given countryName
                                       .filter(c -> comp.equals("min")? c.getPopulation() >= threshold : c.getPopulation() <= threshold) //Only keeps city objects within the population size threshold 
                                       .count()); // Counts how many objects that satisfy the conditions above 
-
-
+        }); 
     }
 
     public long[] getNumberofCountries(int cityCount, int threshold, String comp) throws RemoteException {
-         return submit(() -> (int) cities.stream()
+         return submit(() -> {
+            String key = "getNumberofCountries" + cityCount + threshold + comp;
+            return cachedOrCompute(key, () -> (int) cities.stream()
                      .filter(c -> comp.equals("min") ? c.getPopulation() >= threshold : c.getPopulation() <= threshold) //Only keeps city objects within the population threshold 
                      .collect(Collectors.groupingBy(City::getCountryName, Collectors.counting())) //Maps each country to how many cities they have that satisfy the population threshold
                      .values() //Get the cityCount for each country 
                      .stream()
                      .filter(count -> count >= cityCount) //only keep the countries that have at least cityCount cities 
                      .count()); //Count how many countries satisfy the codition above 
+         });
     }
 
  
 
     public long[] getNumberofCountriesMM(int cityCount, int minPopulation, int maxPopulation)throws RemoteException{
-        return submit( () -> (int) cities.stream()
+        return submit( () ->{
+            String key = "getNumberofCountriesMM" + cityCount + minPopulation + maxPopulation;
+            return cachedOrCompute(key, () -> (int) cities.stream()
                                          .filter(c -> c.getPopulation() >= minPopulation && c.getPopulation() <= maxPopulation) //Only keeps city objects within the population threshold
                                          .collect(Collectors.groupingBy(City::getCountryName, Collectors.counting())) //Maps each country to how many cities they have that satisfy the population threshold
                                          .values() // Get the cityCount for each country 
                                          .stream()
                                          .filter(count ->  count >= cityCount) //only keep the countries that have at least cityCount cities 
                                          .count()); //Count how many countries satisfy the codition above 
+        });
     }
     
     // Used to write to the log keeping track of queue info 
@@ -127,6 +158,19 @@ public class Server implements ServerInterface{
             e.printStackTrace();
         }
 
+    }
+
+    private int cachedOrCompute(String key, Callable<Integer> computation) throws Exception {
+        if (!cachingOn) {
+            return computation.call(); 
+        }
+        Integer cached = cache.get(key);
+        if (cached != null) {
+            return cached;
+        }
+        int result = computation.call();
+        cache.put(key, result);
+        return result;
     }
 
     private long[] submit(Callable<Integer> task) throws RemoteException {
@@ -159,25 +203,6 @@ public class Server implements ServerInterface{
     
 
 
-
-    
-
-   
-
-
-    public static void main(String[] args){
-        try {
-            Server server = new Server();
-           
-            System.out.println("Number of Countries: " + server.getPopulationofCountry("Norway"));
-            System.out.println("Number of Cities: " + server.getNumberofCities("Norway",100000,"min"));
-            System.out.println("Number of Countries: " + server.getNumberofCountries(2,5000000,"min"));
-            System.out.println("Number of Countries: " + server.getNumberofCountriesMM(30,100000,800000));
-
-        } catch (RemoteException e ) {
-            e.printStackTrace();
-        }
-
-    }
+ 
 }
 
