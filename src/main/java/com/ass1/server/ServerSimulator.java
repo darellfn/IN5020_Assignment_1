@@ -20,7 +20,7 @@ public class ServerSimulator{
             int port = 5002;
 
             for(int i=0; i< 5; i++){
-                Server server = new Server();
+                Server server = new Server(false, false);
                 Registry serverRegistry = LocateRegistry.createRegistry(port);
                 ServerInterface serverStub = (ServerInterface) UnicastRemoteObject.exportObject(server, 0);
                 serverRegistry.bind("server" + i, serverStub);
