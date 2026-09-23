@@ -5,7 +5,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.net.CacheRequest;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
@@ -90,7 +89,7 @@ public class Client {
                 // to write the client_cache.txt file
                 case "-wcc":
                 case "--write-client-cache":
-                    if (outputFile == "") { // if not other output file has been set
+                    if (outputFile.equals("")) { // if not other output file has been set
                         outputFile = "client_cache.txt";
                         System.out.println("Writing client cache file.");
                     }
@@ -103,7 +102,7 @@ public class Client {
                 // to write the server_cache.txt file
                 case "-wsc":
                 case "--write-server-cache":
-                    if (outputFile == "") { // if not other output file has been set
+                    if (outputFile.equals("")) { // if not other output file has been set
                         outputFile = "server_cache.txt";
                         System.out.println("Writing server cache file.");
                     }
@@ -116,7 +115,7 @@ public class Client {
                 // to write the naive_server.txt file
                 case "-wns":
                 case "--write-naive-server":
-                    if (outputFile == "") { // if not other output file has been set
+                    if (outputFile.equals("")) { // if not other output file has been set
                         outputFile = "naive_server.txt";
                         System.out.println("Writing naive server file.");
                     }
@@ -134,7 +133,7 @@ public class Client {
             }
         }
 
-        if (outputFile == "client_cache.txt" & !clientCache) {
+        if (outputFile.equals("client_cache.txt") && !clientCache) {
             System.err.println("Error: cannot write to client cache file when client cache is disabled. Please enable client cache.");
             System.exit(1);
         }
@@ -144,16 +143,14 @@ public class Client {
             System.out.println("Delay time set to 20 ms");
         }
 
-        //client.parseQuery("com/ass1/client/exercise_1_input.txt");
-        client.parseQuery("src\\main\\java\\com\\ass1\\client\\exercise_1_input.txt");
-
+        client.parseQuery("com/ass1/client/exercise_1_input.txt");
     }
 
 
     public void parseQuery(String fileName) throws RemoteException, NotBoundException, InterruptedException, IOException {
         File file = new File(fileName);
 
-        if (outputFile == "") { outputFile = "naive_server.txt"; }
+        if (outputFile.equals("")) { outputFile = "naive_server.txt"; }
         BufferedWriter writer = new BufferedWriter(new FileWriter(outputFile));
 
         Registry proxyRegistry = LocateRegistry.getRegistry(1099);
@@ -249,16 +246,14 @@ public class Client {
                 long start = System.currentTimeMillis();
 
                 if (clientCache) {
-                    System.out.println("getPopulationOfCountry: " + country);
-                    String cacheResult = cache.checkCache("getPopulationOfCountry: " + country);   // check the cache for the query
+                    String cacheResult = cache.checkCache(method + country);   // check the cache for the query
                     if (cacheResult != null) {  // if query is in cache
                         long result = Long.parseLong(cacheResult);
-                        System.out.println(result + " - Was in cache!");
-                        // TODO: write this to client 
-                        writeToFile(writer, 0, result, 0, 0, query, "client cache");
-                    }
-                    else {
-                        System.out.println("not in cache :(");
+                        long end = System.currentTimeMillis();
+                        long turnaroundTime = end - start;
+                        addTaskInfo(method, turnaroundTime, 0, 0);
+                        writeToFile(writer, turnaroundTime, result, 0, 0, query, "client cache");
+                        return;
                     }
                 }
 
@@ -273,7 +268,7 @@ public class Client {
                 long waitingTime = results[1];
                 long executionTime = results[2];
 
-                if (clientCache) { cache.addToCache("getPopulationOfCountry: " + country, Long.toString(serverResult)); System.out.println("added to cache -----"); }   // add query to cache (if we are using cache)
+                if (clientCache) { cache.addToCache(method + country, Long.toString(serverResult)); }   // add query to cache (if we are using cache)
 
                 long end = System.currentTimeMillis();
                 long turnaroundTime = end - start;
@@ -298,12 +293,14 @@ public class Client {
                 long start = System.currentTimeMillis();
 
                 if (clientCache) {
-                    String cacheResult = cache.checkCache(query);   // check the cache for the query
+                    String cacheResult = cache.checkCache(method + country + threshold + comp);   // check the cache for the query
                     if (cacheResult != null) {  // if query is in cache
                         long result = Long.parseLong(cacheResult);
-                        System.out.println(result + " - Was in cache!");
-                        // TODO: write this to client
-                        writeToFile(writer, 0, result, 0, 0, query, "client cache");
+                        long end = System.currentTimeMillis();
+                        long turnaroundTime = end - start;
+                        addTaskInfo(method, turnaroundTime, 0, 0);
+                        writeToFile(writer, turnaroundTime, result, 0, 0, query, "client cache");
+                        return;
                     }
                 }
                 
@@ -318,7 +315,7 @@ public class Client {
                 long waitingTime = results[1];
                 long executionTime = results[2];
 
-                if (clientCache) { cache.addToCache(query, Long.toString(serverResult)); }   // add query to cache (if we are using cache)
+                if (clientCache) { cache.addToCache(method + country + threshold + comp, Long.toString(serverResult)); }   // add query to cache (if we are using cache)
 
                 long end = System.currentTimeMillis();
                 long turnaroundTime = end - start;
@@ -342,12 +339,14 @@ public class Client {
                 long start = System.currentTimeMillis();
 
                 if (clientCache) {
-                    String cacheResult = cache.checkCache(query);   // check the cache for the query
+                    String cacheResult = cache.checkCache(method + cityCount + threshold);   // check the cache for the query
                     if (cacheResult != null) {  // if query is in cache
                         long result = Long.parseLong(cacheResult);
-                        System.out.println(result + " - Was in cache!");
-                        // TODO: write this to client
-                        writeToFile(writer, 0, result, 0, 0, query, "client cache");
+                        long end = System.currentTimeMillis();
+                        long turnaroundTime = end - start;
+                        addTaskInfo(method, turnaroundTime, 0, 0);
+                        writeToFile(writer, turnaroundTime, result, 0, 0, query, "client cache");
+                        return;
                     }
                 }
                 
@@ -362,7 +361,7 @@ public class Client {
                 long waitingTime = results[1];
                 long executionTime = results[2];
 
-                if (clientCache) { cache.addToCache(query, Long.toString(serverResult)); }   // add query to cache (if we are using cache)
+                if (clientCache) { cache.addToCache(method + cityCount + threshold, Long.toString(serverResult)); }   // add query to cache (if we are using cache)
 
                 long end = System.currentTimeMillis();
                 long turnaroundTime = end - start;
@@ -386,12 +385,14 @@ public class Client {
                 long start = System.currentTimeMillis();
 
                 if (clientCache) {
-                    String cacheResult = cache.checkCache(query);   // check the cache for the query
+                    String cacheResult = cache.checkCache(method + cityCount + minPopulation + maxPopulation);   // check the cache for the query
                     if (cacheResult != null) {  // if query is in cache
                         long result = Long.parseLong(cacheResult);
-                        System.out.println(result + " - Was in cache!");
-                        // TODO: write this to client
-                        writeToFile(writer, 0, result, 0, 0, query, "client cache");
+                        long end = System.currentTimeMillis();
+                        long turnaroundTime = end - start;
+                        addTaskInfo(method, turnaroundTime, 0, 0);
+                        writeToFile(writer, turnaroundTime, result, 0, 0, query, "client cache");
+                        return;
                     }
                 }
                 
@@ -406,7 +407,7 @@ public class Client {
                 long waitingTime = results[1];
                 long executionTime = results[2];
 
-                if (clientCache) { cache.addToCache(query, Long.toString(serverResult)); }   // add query to cache (if we are using cache)
+                if (clientCache) { cache.addToCache(method + cityCount + minPopulation + maxPopulation, Long.toString(serverResult)); }   // add query to cache (if we are using cache)
                 
                 long end = System.currentTimeMillis();
                 long turnaroundTime = end - start;
