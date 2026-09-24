@@ -261,7 +261,6 @@ public class Client {
 
                 if (clientCache) {
                     String cacheResult = cache.checkCache(cacheKey); // check the cache for the query
-                    System.out.println(cacheResult);
                     if (cacheResult != null) {  // if query is in cache
                         long result = Long.parseLong(cacheResult);
                         long end = System.currentTimeMillis();
@@ -320,7 +319,7 @@ public class Client {
     private synchronized void writeToFile(BufferedWriter writer, long turnaroundTime, long serverResult, long waitingTime, long executionTime, String query, String serverName) throws IOException {
         writer.write(serverResult + " " + query + " (turnaround time: " + turnaroundTime + " ms, execution time: " + executionTime + " ms, waiting time: " + waitingTime + " ms, processed by " + serverName + ")");
         writer.newLine();
-        System.out.println(serverResult + " " + query + " (turnaround time: " + turnaroundTime + " ms, execution time: " + executionTime + " ms, waiting time: " + waitingTime + " ms, processed by " + serverName + ")");
+        // System.out.println(serverResult + " " + query + " (turnaround time: " + turnaroundTime + " ms, execution time: " + executionTime + " ms, waiting time: " + waitingTime + " ms, processed by " + serverName + ")");
         //Print for terminal
     }
 
@@ -360,9 +359,9 @@ public class Client {
                 avgExecutionTime + " ms, avg waiting time: " + avgWaitingTime + " ms, min turn-around time: " + minTurnaroundTime +
                 " ms, max turn-around time: " + maxTurnaroundTime + " ms\n");
 
-                System.out.println(method + " avg turn-around time: " + avgTurnaroundTime + " ms, avg execution time: " + 
-                avgExecutionTime + " ms, avg waiting time: " + avgWaitingTime + " ms, min turn-around time: " + minTurnaroundTime +
-                " ms, max turn-around time: " + maxTurnaroundTime + " ms\n"); //Print for terminal
+                // System.out.println(method + " avg turn-around time: " + avgTurnaroundTime + " ms, avg execution time: " + 
+                // avgExecutionTime + " ms, avg waiting time: " + avgWaitingTime + " ms, min turn-around time: " + minTurnaroundTime +
+                // " ms, max turn-around time: " + maxTurnaroundTime + " ms\n"); //Print for terminal
             }
         }
     }

@@ -4,10 +4,10 @@ com/ass1/Main.class
 com/ass1/server/ServerInterface.class
 com/ass1/client/Client.class
 com/ass1/server/Server.class
-com/ass1/server/Cache.class
 com/ass1/server/Server$1.class
 com/ass1/proxy/ServerInfo.class
-com/ass1/server/Cache$CacheItem.class
+com/ass1/client/Cache.class
 com/ass1/client/TaskInfo.class
 com/ass1/server/ServerSimulator.class
+com/ass1/client/Cache$CacheItem.class
 com/ass1/proxy/ProxyInterface.class
