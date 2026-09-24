@@ -5,7 +5,7 @@ Step-by-step instructions for compiling, building, deploying and running the app
 2. Open the terminal and make sure you are in the `IN5020_Asignment_1` directory
 3. Run the proxy in the terminal\
      `java -cp target/solution-1.0-SNAPSHOT.jar com.ass1.proxy.Proxy`
-4. Open a new terminal and run the server simulator with two required arguments\
+4. Open a new terminal and run the server simulator with the two required arguments\
      `java -cp target/solution-1.0-SNAPSHOT.jar com.ass1.server.ServerSimulator <arg1> <arg2>`
 5. Open a new terminal and run the client with optional flag arguments\
      `java -cp target/solution-1.0-SNAPSHOT.jar com.ass1.client.Client <flags>`
