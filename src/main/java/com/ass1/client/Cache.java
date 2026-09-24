@@ -1,4 +1,4 @@
-package com.ass1.server;
+package com.ass1.client;
 
 import java.util.ArrayList;
 
@@ -73,7 +73,6 @@ public class Cache {
             if (cacheItem.getQuery().equals(query)) {
                 if (method.equals("OLDEST")) {   // update the timestamp if using OLDEST method
                     cacheItem.updateTimestamp();
-                    // TODO: unsure about this line below: (should i move stuff around in the cache?)
                     if (cacheStorage.remove(cacheItem)) { cacheStorage.add(cacheItem); }    // move the most recently accessed item to the back of the cache list
                 } 
                 return cacheItem.getData();
@@ -91,41 +90,10 @@ public class Cache {
                 cacheStorage.add(new CacheItem(query, data));
                 return;
             }
-            if (method.equals("FIFO")) {
-                fifo(query, data); 
-            }
-            else {  // if method == "OLDEST"
-                oldest(query, data);
-            }
+            // if query is not in cache, remove another one in cache to make space for the this one
+            cacheStorage.remove(0); // remove first (oldest) entry (if using OLDEST method: this has the oldest timestamp because of the sorting done in checkCache)
+            cacheStorage.add(new CacheItem(query, data));   // add new entry to the end of the cache list
         }
-    }
-
-    // method 1: FIFO
-    synchronized public void fifo(String query, String data) {
-        cacheStorage.remove(0);   // remove first (oldest) entry
-        cacheStorage.add(new CacheItem(query, data));   // add new entry to the end of the cache list
-    }
-
-    // method 2: OLDEST
-    synchronized public void oldest(String query, String data) {
-        // TODO: use this is we are not sorting the list in checkCache:
-        /*
-        long minTimestamp = System.currentTimeMillis();
-        CacheItem oldestCacheItem = null;
-        // iterate over cache items to find the one with oldest timestamp
-        for (CacheItem cacheItem : cacheStorage) {
-            if (cacheItem.getTimestamp() < minTimestamp) {
-                minTimestamp = cacheItem.getTimestamp();
-                oldestCacheItem = cacheItem;
-            }
-        }
-        cacheStorage.remove(oldestCacheItem);   // remove entry with oldest timestamp
-        cacheStorage.add(new CacheItem(query, data));   // add new entry to the end of the cache list
-        */
-
-        // TODO: literally the same as fifo method if we sort the list in checkCache
-        cacheStorage.remove(0);   // remove first entry (has the oldest timestamp because of the sorting done in checkCache)
-        cacheStorage.add(new CacheItem(query, data));   // add new entry to the end of the cache list
     }
 
 }

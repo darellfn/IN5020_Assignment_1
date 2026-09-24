@@ -13,7 +13,6 @@ import java.util.ArrayList;
 import java.util.Scanner;
 
 import com.ass1.proxy.ProxyInterface;
-import com.ass1.server.Cache;
 import com.ass1.server.ServerInterface;
 
 public class Client {
