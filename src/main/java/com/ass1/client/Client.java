@@ -146,6 +146,7 @@ public class Client {
     }
 
     public void parseQuery() throws RemoteException, NotBoundException, InterruptedException, IOException {
+        System.out.println("Client is running...");
         File file = new File("data/exercise_1_input.txt");
 
         if (outputFile.equals("")) { outputFile = "output/naive_server.txt"; }
