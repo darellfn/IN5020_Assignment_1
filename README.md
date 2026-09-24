@@ -25,17 +25,6 @@ The second argument enables the OLDEST cache method:\
 `true` - OLDEST method used\
 `false` - FIFO method used
 
-#### Examples
-No server cache\
-`java com\ass1\server\ServerSimulator.java false false`
-
-Server cache with FIFO method\
-`java com\ass1\server\ServerSimulator.java true false`
-
-Server cache with OLDEST method\
-`java com\ass1\server\ServerSimulator.java true true`
-
-</br>
 
 ### `Client.java`
 
@@ -58,21 +47,3 @@ To set which output file to create/write to, use the following flags:\
 `-wsc` `--write-server-cache` (writes  `server_cache.txt`)\
 `-wns` `--write-naive-server` (writes  `naive_server.txt`)\
 If none of these flags are given, the default output file is `naive_server.txt`.
-
-#### Examples
-No client cache\
-`java com\ass1\server\Client.java`\
-`java com\ass1\server\Client.java -wns`\
-
-Client cache and 50 ms delay\
-`java com\ass1\server\Client.java -cc -50`
-
-Client cache with FIFO method\
-`java com\ass1\server\Client.java -cc`\
-`java com\ass1\server\Client.java -cc -fifo`
-
-Enable client cache and write `server_cache.txt` output file\
-`java com\ass1\server\Client.java -cc -wsc`\
-`java com\ass1\server\Client.java -cc --write-server-cache`
-
-
