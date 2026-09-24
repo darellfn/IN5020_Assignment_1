@@ -1,4 +1,3 @@
-# README
 
 # User guide
 Step-by-step instructions for compiling, building, deploying and running the application:
