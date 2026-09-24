@@ -1,7 +1,7 @@
 
 # User guide
 Step-by-step instructions for compiling, building, deploying and running the application:
-1. First, navigate to the `src\main\java\` folder\
+1. Navigate to the `src\main\java\` directory\
    `cd src\main\java\`
 2. Compile all java files within `com\ass1\`\
      `javac com\ass1\*\*.java`
