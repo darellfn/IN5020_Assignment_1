@@ -7,7 +7,7 @@ Step-by-step instructions for compiling, building, deploying and running the app
      `java -cp target/solution-1.0-SNAPSHOT.jar com.ass1.proxy.Proxy`
 4. Open a new terminal and run `ServerSimulator.java` with two required arguments\
      `java -cp target/solution-1.0-SNAPSHOT.jar com/ass1/server/ServerSimulator <arg1> <arg2>`
-5. Open a nre terminal and run `Client.java` with optional flag arguments\
+5. Open a new terminal and run `Client.java` with optional flag arguments\
      `java -cp target/solution-1.0-SNAPSHOT.jar com/ass1/client.Client <flags>`
 
 Flags and arguments are explained in the [next section](#command-line-flags).
