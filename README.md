@@ -1,16 +1,14 @@
 
 # User guide
 Step-by-step instructions for compiling, building, deploying and running the application:
-1. Navigate to the `src\main\java\` directory\
-   `cd src\main\java\`
-2. Compile all java files within `com\ass1\`\
-     `javac com\ass1\*\*.java`
-3. Run `Proxy.java` \
-     `java com\ass1\proxy\Proxy.java`
-4. Run `ServerSimulator.java` with two arguments\
-     `java com\ass1\server\ServerSimulator.java <arg1> <arg2>`
+1. Download the repository from this github
+2. Open the terminal and make sure you are in the `IN5020_Asignment_1` directory
+3. Run `Proxy.java`\
+     `java -cp target/solution-1.0-SNAPSHOT.jar com.ass1.proxy.Proxy`
+4. Run `ServerSimulator.java` with two required arguments\
+     `java -cp target/solution-1.0-SNAPSHOT.jar com/ass1/server/ServerSimulator <arg1> <arg2>`
 5. Run `Client.java` with optional flag arguments\
-     `java com\ass1\client\Client.java <flags>`
+     `java -cp target/solution-1.0-SNAPSHOT.jar com/ass1/client.Client <flags>`
 
 Flags and arguments are explained in the [next section](#command-line-flags).
 
